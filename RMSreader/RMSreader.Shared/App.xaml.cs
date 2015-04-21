@@ -147,7 +147,7 @@ namespace RMSreader
             var file = (args.Files[0] as StorageFile);
             bool fileValid = true;
 
-            if (!file.FileType.Equals(".ppdf"))
+            if (!file.FileType.Equals(".pdf"))
                 fileValid = false;
             else
             {

@@ -127,6 +127,12 @@
       <Name>PDFNet for Windows Phone Universal apps</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Downloads\PDFNetUniversal\Samples\PDFViewCtrlTools\PDFViewCtrlTools.WindowsPhone\PDFViewCtrlTools.WindowsPhone.csproj">
+      <Project>{55869577-1e41-45f9-b4d6-bd0cc86c6ac9}</Project>
+      <Name>PDFViewCtrlTools.WindowsPhone</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
