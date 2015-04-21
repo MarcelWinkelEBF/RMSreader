@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <Grid Margin="12,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -21,11 +21,11 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Margin="19,6.5,0,0">
+            <StackPanel Grid.Row="0" Margin="0,6.5,0,0">
                 <TextBlock Text="RMS Reader" Style="{ThemeResource HeaderTextBlockStyle}" Margin="0,12,0,0"/>
             </StackPanel>
         </Grid>
-        <TextBlock Grid.Row="1" x:Name="lastFileName" />
+        <TextBlock Grid.Row="1" FontSize="16" x:Name="lastFileName" />
         
         <Button Grid.Row="2" x:Name="loadLocalFile" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Content="Datei auswählen" Click="loadLocalFile_Click"/>
 

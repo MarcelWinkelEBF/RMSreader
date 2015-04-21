@@ -32,6 +32,7 @@ namespace RMSreader
 #if WINDOWS_PHONE_APP
         private TransitionCollection transitions;
 #endif
+        public static StorageFile importedPdfFile;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -160,6 +161,7 @@ namespace RMSreader
             else
             {
                 LocalStorage.SaveSetting("lastFileName", file.Name);
+                importedPdfFile = file;
             }
 
             // Navigate to individuell page
@@ -188,6 +190,13 @@ namespace RMSreader
             {
                 App.Current.Exit();
             }));
+            await messageDialog.ShowAsync();
+        }
+
+        public static async void ShowErrorDialog(string message, string title)
+        {
+            var messageDialog = new MessageDialog(message, title);
+            messageDialog.Commands.Add(new UICommand("Ok"));
             await messageDialog.ShowAsync();
         }
     }

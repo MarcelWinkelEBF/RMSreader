@@ -9,6 +9,7 @@ using Windows.Storage.Pickers;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Navigation;
+using Windows.Data;
 
 namespace RMSreader
 {
@@ -24,8 +25,14 @@ namespace RMSreader
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            this.navigationHelper.OnNavigatedTo(e);
             if (e.NavigationMode == NavigationMode.New)
                 lastFileName.Text = Convert.ToString(LocalStorage.GetSetting("lastFileName"));
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            this.navigationHelper.OnNavigatedFrom(e);
         }
     }
 }

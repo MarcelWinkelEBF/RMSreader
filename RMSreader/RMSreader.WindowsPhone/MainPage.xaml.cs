@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RMSreader.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,11 +27,22 @@ namespace RMSreader
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private NavigationHelper navigationHelper;
+
         public MainPage()
         {
             this.InitializeComponent();
 
+            this.navigationHelper = new NavigationHelper(this);
             this.NavigationCacheMode = NavigationCacheMode.Required;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
+        /// </summary>
+        public NavigationHelper NavigationHelper
+        {
+            get { return this.navigationHelper; }
         }
 
         private void loadLocalFile_Click(object sender, RoutedEventArgs e)
@@ -40,7 +52,7 @@ namespace RMSreader
             filePicker.ViewMode = PickerViewMode.List;
 
             filePicker.FileTypeFilter.Clear();
-            filePicker.FileTypeFilter.Add(".ppdf");
+            filePicker.FileTypeFilter.Add(".pdf");
 
             filePicker.PickSingleFileAndContinue();
 
@@ -63,6 +75,12 @@ namespace RMSreader
                     var messageDialog = new MessageDialog("Das Dokument hatte entweder ein falsches Format oder enthielt Fehler. Ein Import kann erneut versucht werden und die Applikation wird geschlossen.", "Fehlerhafter Import");
                     messageDialog.Commands.Add(new UICommand("Ok"));
                     await messageDialog.ShowAsync();
+                }
+                else
+                {
+                    LocalStorage.SaveSetting("lastFileName", storageFile.Name);
+                    App.importedPdfFile = storageFile;
+                    Frame.Navigate(typeof(PdfView));
                 }
             }
         }

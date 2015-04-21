@@ -17,5 +17,8 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)MainPage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LocalStorage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\NavigationHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\RelayCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\SuspensionManager.cs" />
   </ItemGroup>
 </Project>
