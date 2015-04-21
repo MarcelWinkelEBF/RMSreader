@@ -1,12 +1,16 @@
-﻿using System;
+﻿using RMSreader.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -132,6 +136,59 @@ namespace RMSreader
 
             // TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        protected async override void OnFileActivated(FileActivatedEventArgs args)
+        {
+            var page = new MainPage();
+
+            // Get file from args
+            var file = (args.Files[0] as StorageFile);
+            bool fileValid = true;
+
+            if (!file.FileType.Equals(".ppdf"))
+                fileValid = false;
+            else
+            {
+                fileValid = await GetContentFromStorageFile(file);
+            }
+
+            if (!fileValid)
+            {
+                ShowErrorMessageAndClose();
+            }
+            else
+            {
+                LocalStorage.SaveSetting("lastFileName", file.Name);
+            }
+
+            // Navigate to individuell page
+            Window.Current.Content = page;
+            Window.Current.Activate();
+        }
+
+        public static async Task<bool> GetContentFromStorageFile(StorageFile file)
+        {
+            // Get content from file
+            var randomAccessStream = await file.OpenReadAsync();
+            Stream stream = randomAccessStream.AsStreamForRead();
+            StreamReader streamReader = new StreamReader(stream);
+            var fileContent = await streamReader.ReadToEndAsync();
+
+            if (fileContent == null)
+                return false;
+
+            return true;
+        }
+
+        private async void ShowErrorMessageAndClose()
+        {
+            var messageDialog = new MessageDialog("Das Dokument hatte entweder ein falsches Format oder enthielt Fehler. Ein Import kann erneut versucht werden und die Applikation wird geschlossen.", "Fehlerhafter Import");
+            messageDialog.Commands.Add(new UICommand("Schließen", command =>
+            {
+                App.Current.Exit();
+            }));
+            await messageDialog.ShowAsync();
         }
     }
 }
