@@ -27,7 +27,8 @@
         </Grid>
         <TextBlock Grid.Row="1" FontSize="16" x:Name="lastFileName" />
         
-        <Button Grid.Row="2" x:Name="loadLocalFile" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Content="Datei auswählen" Click="loadLocalFile_Click"/>
+        <Button Grid.Row="2" x:Name="loadLocalFile" VerticalAlignment="Bottom" Margin="0, 40" HorizontalAlignment="Stretch" Content="Datei auswählen" Click="loadLocalFile_Click"/>
+        <Button Grid.Row="2" x:Name="login" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Click="login_Click" Content="Login" />
 
     </Grid>
 </Page>

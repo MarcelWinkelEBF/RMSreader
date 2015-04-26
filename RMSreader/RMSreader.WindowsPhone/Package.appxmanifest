@@ -26,7 +26,7 @@
           <FileTypeAssociation Name="pdf">
             <DisplayName>PDF</DisplayName>
             <SupportedFileTypes>
-              <FileType>.pdf</FileType>
+              <FileType>.ppdf</FileType>
             </SupportedFileTypes>
           </FileTypeAssociation>
         </Extension>

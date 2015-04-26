@@ -1,6 +1,7 @@
 ﻿using RMSreader.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -9,7 +10,9 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Security.Authentication.Web;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -139,6 +142,55 @@ namespace RMSreader
             deferral.Complete();
         }
 
+        ContinuationManager continuationManager;
+        protected override async void OnActivated(IActivatedEventArgs e)
+        {
+            base.OnActivated(e);
+
+            continuationManager = new ContinuationManager();
+
+            Frame rootFrame = CreateRootFrame();
+
+            if (rootFrame.Content == null)
+            {
+                rootFrame.Navigate(typeof(MainPage));
+            }
+
+            var continuationEventArgs = e as IContinuationActivatedEventArgs;
+            if (continuationEventArgs != null)
+            {
+                Frame scenarioFrame = Window.Current.Content as Frame;
+                if (scenarioFrame != null)
+                {
+                    // Call ContinuationManager to handle continuation activation
+                    continuationManager.Continue(continuationEventArgs, scenarioFrame);
+                }
+            }
+
+            Window.Current.Activate();
+        }
+
+        private Frame CreateRootFrame()
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                // Set the default language
+                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            return rootFrame;
+        }   
+
         protected async override void OnFileActivated(FileActivatedEventArgs args)
         {
             var page = new MainPage();
@@ -147,7 +199,7 @@ namespace RMSreader
             var file = (args.Files[0] as StorageFile);
             bool fileValid = true;
 
-            if (!file.FileType.Equals(".pdf"))
+            if (!file.FileType.Equals(".ppdf"))
                 fileValid = false;
             else
             {
@@ -161,6 +213,7 @@ namespace RMSreader
             else
             {
                 LocalStorage.SaveSetting("lastFileName", file.Name);
+
                 importedPdfFile = file;
             }
 
@@ -174,10 +227,23 @@ namespace RMSreader
             // Get content from file
             var randomAccessStream = await file.OpenReadAsync();
             Stream stream = randomAccessStream.AsStreamForRead();
-            StreamReader streamReader = new StreamReader(stream);
-            var fileContent = await streamReader.ReadToEndAsync();
+            //StreamReader streamReader = new StreamReader(stream);
+            //var fileContent = await streamReader.ReadToEndAsync();
 
-            if (fileContent == null)
+            byte[] bytes = new byte[stream.Length];
+            await stream.ReadAsync(bytes, 0, bytes.Length);
+            IBuffer iBuff = bytes.AsBuffer();
+
+            try
+            {
+                var test = await Microsoft.RightsManagement.UserPolicy.AcquireAsync(iBuff, "Moritz.Heilmann@henkel.com", new MRMAuthCallBack(), new MRMConsentCallback(), Microsoft.RightsManagement.PolicyAcquisitionOptions.None);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            if (stream == null)
                 return false;
 
             return true;
@@ -199,5 +265,32 @@ namespace RMSreader
             messageDialog.Commands.Add(new UICommand("Ok"));
             await messageDialog.ShowAsync();
         }
+
+
     }
+}
+
+class MRMAuthCallBack : Microsoft.RightsManagement.IAuthenticationCallback
+{
+    #region IAuthenticationCallback Members
+
+    IAsyncOperation<string> Microsoft.RightsManagement.IAuthenticationCallback.GetTokenAsync(Microsoft.RightsManagement.AuthenticationParameters authenticationParameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+}
+
+class MRMConsentCallback : Microsoft.RightsManagement.IConsentCallback
+{
+
+    #region IConsentCallback Members
+
+    public IAsyncOperation<IEnumerable<Microsoft.RightsManagement.IConsent>> ConsentsAsync(IEnumerable<Microsoft.RightsManagement.IConsent> consents)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
 }

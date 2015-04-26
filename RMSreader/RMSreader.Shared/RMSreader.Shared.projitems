@@ -16,6 +16,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)MainPage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ContinuationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LocalStorage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\NavigationHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\RelayCommand.cs" />

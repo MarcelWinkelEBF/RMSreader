@@ -52,7 +52,7 @@ namespace RMSreader
             filePicker.ViewMode = PickerViewMode.List;
 
             filePicker.FileTypeFilter.Clear();
-            filePicker.FileTypeFilter.Add(".pdf");
+            filePicker.FileTypeFilter.Add(".ppdf");
 
             filePicker.PickSingleFileAndContinue();
 
