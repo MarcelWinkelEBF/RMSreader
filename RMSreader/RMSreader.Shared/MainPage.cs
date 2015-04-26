@@ -53,7 +53,7 @@ namespace RMSreader
             try
             {
                 authContext = await Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext.CreateAsync("https://login.windows.net/appsthepagedot.onmicrosoft.com", true);
-                authContext.AcquireTokenAndContinue("   https://graph.windows.net/", "eaba3c4d-f622-4063-830d-bd75cda400f5", new Uri("http://www.google.de"), authenticationContextDelegate);
+                authContext.AcquireTokenAndContinue("https://graph.windows.net/", "eaba3c4d-f622-4063-830d-bd75cda400f5", new Uri("http://www.google.de"), authenticationContextDelegate);
             }
             catch (Exception e)
             {
@@ -65,23 +65,37 @@ namespace RMSreader
         {
             authResult = result;
 
-            if (result.Status == Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.Success)
+            switch (authResult.Status)
             {
-                Debug.WriteLine(authResult.AccessToken.ToString());
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine(authResult.Status.ToString());
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine(authResult.AccessTokenType.ToString());
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine("-----------------------------------------");
-                Debug.WriteLine(authResult.UserInfo.GivenName.ToString());
+                case Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.Success:
+                    SaveTokenLocal();
+                    break;
+                case Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.ServiceError:
+                    App.ShowErrorDialog("Die Anmeldung am Server ist fehlgeschlagen. Überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.", "Fehler");
+                    break;
+                case Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.ClientError:
+                    App.ShowErrorDialog("Die Anmeldung am Server ist fehlgeschlagen, da es einen Fehler in der Applikation gab. Bitte versuchen Sie die Anmeldung erneut.", "Fehler");
+                    break;
             }
         }
+
+        private void SaveTokenLocal()
+        {   
+            Debug.WriteLine(authResult.AccessToken.ToString());
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine(authResult.Status.ToString());
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine(authResult.AccessTokenType.ToString());
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine(authResult.UserInfo.GivenName.ToString());
+        }
+
         public async void ContinueWebAuthentication(WebAuthenticationBrokerContinuationEventArgs args)
         {
             await authContext.ContinueAcquireTokenAsync(args);
