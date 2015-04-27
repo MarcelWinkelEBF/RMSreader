@@ -234,9 +234,11 @@ namespace RMSreader
             await stream.ReadAsync(bytes, 0, bytes.Length);
             IBuffer iBuff = bytes.AsBuffer();
 
+            var mailId = Convert.ToString(LocalStorage.GetSetting("mailId"));
+
             try
             {
-                var test = await Microsoft.RightsManagement.UserPolicy.AcquireAsync(iBuff, "Moritz.Heilmann@henkel.com", new MRMAuthCallBack(), new MRMConsentCallback(), Microsoft.RightsManagement.PolicyAcquisitionOptions.None);
+                var test = await Microsoft.RightsManagement.UserPolicy.AcquireAsync(iBuff, mailId, new MRMAuthCallBack(), new MRMConsentCallback(), Microsoft.RightsManagement.PolicyAcquisitionOptions.None);
             }
             catch (Exception e)
             {

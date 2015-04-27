@@ -52,5 +52,14 @@ namespace RMSreader.Services
             }
             return null;
         }
+
+        public static void RemoveSetting(string key)
+        {
+            ApplicationDataContainer LocalStorage = ApplicationData.Current.LocalSettings;
+            if (LocalStorage.Values.ContainsKey(key))
+            {
+                LocalStorage.Values.Remove(key);
+            }
+        }
     }
 }

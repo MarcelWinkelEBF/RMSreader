@@ -13,6 +13,7 @@ using Windows.Data;
 using Windows.UI.Xaml.Controls;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Windows.UI.Xaml.Input;
 
 namespace RMSreader
 {
@@ -43,16 +44,61 @@ namespace RMSreader
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
-        private async void login_Click(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            await Login();
+            var mailId = Convert.ToString(LocalStorage.GetSetting("mailId"));
+            var name = Convert.ToString(LocalStorage.GetSetting("name"));
+
+            if (!String.IsNullOrEmpty(mailId))
+            {
+                loginButton.Visibility = Visibility.Collapsed;
+                logoutButton.Visibility = Visibility.Visible;
+                userName.Text = "Hallo, " + name;
+                var accessToken = LocalStorage.GetSetting("accessToken");
+                var refreshToken = LocalStorage.GetSetting("refreshToken");
+            }
+            else
+            {
+                logoutButton.Visibility = Visibility.Collapsed;
+                loginButton.Visibility = Visibility.Visible;
+            }
         }
 
-        public async Task Login()
+        private void loginButton_Click(object sender, RoutedEventArgs e)
+        {
+            Login();
+        }
+
+        private void logoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            Logout();
+        }
+
+        private void Logout()
+        {
+            if (authContext != null && authContext.TokenCache != null)
+                authContext.TokenCache.Clear();
+            if (authResult != null)
+                authResult = null;
+
+
+            LocalStorage.RemoveSetting("mailId");
+            LocalStorage.RemoveSetting("name");
+
+            LocalStorage.RemoveSetting("accessToken");
+            LocalStorage.RemoveSetting("refreshToken");
+
+            logoutButton.Visibility = Visibility.Collapsed;
+            loginButton.Visibility = Visibility.Visible;
+
+            userName.Text = "Nicht eigneloggt!";
+        }
+
+        public void Login()
         {
             try
             {
-                authContext = await Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext.CreateAsync("https://login.windows.net/appsthepagedot.onmicrosoft.com", true);
+                authContext = Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext.CreateAsync("https://login.windows.net/appsthepagedot.onmicrosoft.com", true).GetResults();
                 authContext.AcquireTokenAndContinue("https://graph.windows.net/", "eaba3c4d-f622-4063-830d-bd75cda400f5", new Uri("http://www.google.de"), authenticationContextDelegate);
             }
             catch (Exception e)
@@ -69,6 +115,9 @@ namespace RMSreader
             {
                 case Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.Success:
                     SaveTokenLocal();
+                    loginButton.Visibility = Visibility.Collapsed;
+                    logoutButton.Visibility = Visibility.Visible;
+                    userName.Text = "Hallo, " + authResult.UserInfo.GivenName;
                     break;
                 case Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationStatus.ServiceError:
                     App.ShowErrorDialog("Die Anmeldung am Server ist fehlgeschlagen. Überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.", "Fehler");
@@ -80,20 +129,12 @@ namespace RMSreader
         }
 
         private void SaveTokenLocal()
-        {   
-            Debug.WriteLine(authResult.AccessToken.ToString());
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine(authResult.Status.ToString());
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine(authResult.AccessTokenType.ToString());
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine("-----------------------------------------");
-            Debug.WriteLine(authResult.UserInfo.GivenName.ToString());
+        {
+            LocalStorage.SaveSetting("mailId", authResult.UserInfo.DisplayableId);
+            LocalStorage.SaveSetting("name", authResult.UserInfo.GivenName);
+
+            LocalStorage.SaveSetting("accessToken", authResult.AccessToken);
+            LocalStorage.SaveSetting("refreshToken", authResult.RefreshToken);
         }
 
         public async void ContinueWebAuthentication(WebAuthenticationBrokerContinuationEventArgs args)

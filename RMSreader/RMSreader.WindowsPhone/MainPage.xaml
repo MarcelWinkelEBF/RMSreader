@@ -6,8 +6,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Loaded="Page_Loaded"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="loginButton" Icon="Account" Content="Login" Click="loginButton_Click" />
+            <AppBarButton x:Name="logoutButton" Icon="Clear" Content="Logout" Click="logoutButton_Click" Visibility="Collapsed" />
+        </CommandBar>
+    </Page.BottomAppBar>
+    
     <Grid Margin="12,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,10 +33,12 @@
                 <TextBlock Text="RMS Reader" Style="{ThemeResource HeaderTextBlockStyle}" Margin="0,12,0,0"/>
             </StackPanel>
         </Grid>
-        <TextBlock Grid.Row="1" FontSize="16" x:Name="lastFileName" />
+        <StackPanel Grid.Row="1">
+            <TextBlock FontSize="16" x:Name="userName" />
+            <TextBlock FontSize="16" x:Name="lastFileName" />
+        </StackPanel>
         
-        <Button Grid.Row="2" x:Name="loadLocalFile" VerticalAlignment="Bottom" Margin="0, 40" HorizontalAlignment="Stretch" Content="Datei auswählen" Click="loadLocalFile_Click"/>
-        <Button Grid.Row="2" x:Name="login" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Click="login_Click" Content="Login" />
+        <Button Grid.Row="2" x:Name="loadLocalFile" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Content="Datei auswählen" Click="loadLocalFile_Click"/>
 
     </Grid>
 </Page>
